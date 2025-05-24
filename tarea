@@ -1,0 +1,149 @@
+#include <stdio.h>
+#include <string.h>
+
+#define MAX_PRODUCTOS 5
+#define MAX_NOMBRE 50
+
+char nombres[MAX_PRODUCTOS][MAX_NOMBRE];
+int tiempos[MAX_PRODUCTOS];
+int recursos[MAX_PRODUCTOS];
+int cantidades[MAX_PRODUCTOS];
+int totalProductos = 0;
+
+void ingresarProducto() {
+    if (totalProductos >= MAX_PRODUCTOS) {
+        printf("No se pueden ingresar más productos.\n");
+        return;
+    }
+
+    printf("Nombre del producto: ");
+    scanf(" %[^\n]", nombres[totalProductos]);
+
+    printf("Tiempo de fabricación por unidad: ");
+    scanf("%d", &tiempos[totalProductos]);
+
+    printf("Recursos requeridos por unidad: ");
+    scanf("%d", &recursos[totalProductos]);
+
+    printf("Cantidad demandada: ");
+    scanf("%d", &cantidades[totalProductos]);
+
+    totalProductos++;
+}
+
+void mostrarProductos() {
+    printf("\n--- Lista de Productos ---\n");
+    for (int i = 0; i < totalProductos; i++) {
+        printf("%d. %s - Tiempo: %d - Recursos: %d - Cantidad: %d\n",
+            i + 1, nombres[i], tiempos[i], recursos[i], cantidades[i]);
+    }
+}
+
+int buscarProducto(char nombreBuscar[MAX_NOMBRE]) {
+    for (int i = 0; i < totalProductos; i++) {
+        if (strcmp(nombres[i], nombreBuscar) == 0) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+void editarProducto() {
+    char nombreBuscar[MAX_NOMBRE];
+    printf("Nombre del producto a editar: ");
+    scanf(" %[^\n]", nombreBuscar);
+
+    int index = buscarProducto(nombreBuscar);
+    if (index == -1) {
+        printf("Producto no encontrado.\n");
+        return;
+    }
+
+    printf("Nuevo nombre del producto: ");
+    scanf(" %[^\n]", nombres[index]);
+
+    printf("Nuevo tiempo de fabricación por unidad: ");
+    scanf("%d", &tiempos[index]);
+
+    printf("Nuevos recursos requeridos por unidad: ");
+    scanf("%d", &recursos[index]);
+
+    printf("Nueva cantidad demandada: ");
+    scanf("%d", &cantidades[index]);
+}
+
+void eliminarProducto() {
+    char nombreBuscar[MAX_NOMBRE];
+    printf("Nombre del producto a eliminar: ");
+    scanf(" %[^\n]", nombreBuscar);
+
+    int index = buscarProducto(nombreBuscar);
+    if (index == -1) {
+        printf("Producto no encontrado.\n");
+        return;
+    }
+
+    for (int i = index; i < totalProductos - 1; i++) {
+        strcpy(nombres[i], nombres[i + 1]);
+        tiempos[i] = tiempos[i + 1];
+        recursos[i] = recursos[i + 1];
+        cantidades[i] = cantidades[i + 1];
+    }
+
+    totalProductos--;
+    printf("Producto eliminado exitosamente.\n");
+}
+
+void calcularTotales(int tiempoDisponible, int recursosDisponibles) {
+    int tiempoTotal = 0;
+    int recursosTotales = 0;
+
+    for (int i = 0; i < totalProductos; i++) {
+        tiempoTotal += tiempos[i] * cantidades[i];
+        recursosTotales += recursos[i] * cantidades[i];
+    }
+
+    printf("\nTiempo total requerido: %d\n", tiempoTotal);
+    printf("Recursos totales requeridos: %d\n", recursosTotales);
+
+    if (tiempoTotal <= tiempoDisponible && recursosTotales <= recursosDisponibles) {
+        printf("La fábrica puede cumplir con la demanda.\n");
+    } else {
+        printf("La fábrica NO puede cumplir con la demanda.\n");
+    }
+}
+
+int main() {
+    int opcion;
+    int tiempoDisponible, recursosDisponibles;
+
+    printf("Ingrese el tiempo total disponible en la fábrica: ");
+    scanf("%d", &tiempoDisponible);
+
+    printf("Ingrese los recursos totales disponibles en la fábrica: ");
+    scanf("%d", &recursosDisponibles);
+
+    do {
+        printf("\n--- MENÚ ---\n");
+        printf("1. Ingresar producto\n");
+        printf("2. Mostrar productos\n");
+        printf("3. Editar producto\n");
+        printf("4. Eliminar producto\n");
+        printf("5. Calcular totales y verificar demanda\n");
+        printf("6. Salir\n");
+        printf("Seleccione una opción: ");
+        scanf("%d", &opcion);
+
+        switch (opcion) {
+            case 1: ingresarProducto(); break;
+            case 2: mostrarProductos(); break;
+            case 3: editarProducto(); break;
+            case 4: eliminarProducto(); break;
+            case 5: calcularTotales(tiempoDisponible, recursosDisponibles); break;
+            case 6: printf("Saliendo...\n"); break;
+            default: printf("Opción no válida.\n");
+        }
+    } while (opcion != 6);
+
+    return 0;
+}
